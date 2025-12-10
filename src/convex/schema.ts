@@ -30,14 +30,30 @@ const schema = defineSchema(
       isAnonymous: v.optional(v.boolean()), // is the user anonymous. do not remove
 
       role: v.optional(roleValidator), // role of the user. do not remove
-    }).index("email", ["email"]), // index for the email. do not remove or modify
+      
+      // Custom fields for Aurum-AI
+      walletAddress: v.optional(v.string()),
+      armBalance: v.optional(v.number()),
+      depositedAmount: v.optional(v.number()),
+      riskPreference: v.optional(v.string()), // "Aggressive" | "Safe"
+    }).index("email", ["email"]).index("by_walletAddress", ["walletAddress"]),
 
-    // add other tables here
+    vault_states: defineTable({
+      status: v.string(), // "RISK_ON" | "RISK_OFF"
+      current_apy: v.number(),
+      tvl: v.number(),
+      gold_price: v.number(),
+      qie_price: v.number(),
+      timestamp: v.number(),
+    }).index("by_timestamp", ["timestamp"]),
 
-    // tableName: defineTable({
-    //   ...
-    //   // table fields
-    // }).index("by_field", ["field"])
+    transactions: defineTable({
+      user_id: v.id("users"),
+      type: v.string(), // "DEPOSIT" | "WITHDRAW" | "REBALANCE"
+      amount: v.number(),
+      tx_hash: v.string(),
+      timestamp: v.number(),
+    }).index("by_user", ["user_id"]),
   },
   {
     schemaValidation: false,
