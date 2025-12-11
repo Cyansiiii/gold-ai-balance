@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { motion, useSpring, useTransform, useMotionValue, animate } from "framer-motion";
 import { 
   AreaChart, 
@@ -68,10 +68,12 @@ export default function Dashboard() {
   const createTransaction = useMutation(api.transactions.createTransaction);
   const seedVault = useMutation(api.vault.seedVaultData);
   const toggleRisk = useMutation(api.vault.toggleRiskState);
+  const analyzeMarket = useAction(api.ai.analyzeMarket);
 
   const [amount, setAmount] = useState("");
   const [convertAmount, setConvertAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Ensure user has a wallet when they visit dashboard
   useEffect(() => {
@@ -139,6 +141,19 @@ export default function Dashboard() {
       toast.success(`Risk mode updated`);
     } catch (error) {
       toast.error("Failed to update risk mode");
+    }
+  };
+
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    try {
+      const result = await analyzeMarket();
+      toast.success("Market analysis complete");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to analyze market");
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -425,16 +440,34 @@ export default function Dashboard() {
 
             <Card className="glass border-none bg-gradient-to-br from-primary/10 to-transparent">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-primary" />
-                  AI Insights
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    AI Insights
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="h-7 text-xs bg-white/5 hover:bg-white/10 border-white/10"
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing}
+                  >
+                    {isAnalyzing ? (
+                      <RefreshCw className="w-3 h-3 animate-spin mr-1" />
+                    ) : (
+                      <Zap className="w-3 h-3 mr-1" />
+                    )}
+                    {isAnalyzing ? "Analyzing..." : "Run Analysis"}
+                  </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Market Sentiment</span>
-                    <span className="text-green-400 font-medium">Bullish</span>
+                    <span className={vaultState?.status === "RISK_ON" ? "text-green-400 font-medium" : "text-red-400 font-medium"}>
+                      {vaultState?.status === "RISK_ON" ? "Bullish (Risk On)" : "Bearish (Risk Off)"}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Volatility Index</span>
@@ -444,8 +477,8 @@ export default function Dashboard() {
                     <span className="text-muted-foreground">Next Rebalance</span>
                     <span className="text-white font-medium">~4h 12m</span>
                   </div>
-                  <div className="mt-4 p-3 rounded bg-black/20 text-xs text-muted-foreground">
-                    "AI suggests increasing Gold allocation due to rising global uncertainty metrics."
+                  <div className="mt-4 p-3 rounded bg-black/20 text-xs text-muted-foreground border border-white/5">
+                    {vaultState?.analysis || "\"AI suggests increasing Gold allocation due to rising global uncertainty metrics.\""}
                   </div>
                 </div>
               </CardContent>

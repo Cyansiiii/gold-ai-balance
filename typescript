@@ -1,0 +1,15 @@
+export const updateVaultState = mutation({
+  args: {
+    status: v.string(),
+    current_apy: v.number(),
+    tvl: v.number(),
+    gold_price: v.number(),
+    qie_price: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.insert("vault_states", {
+      ...args,
+      timestamp: Date.now(),
+    });
+  },
+});

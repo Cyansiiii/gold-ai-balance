@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 
 export const getVaultState = query({
   args: {},
@@ -45,13 +45,14 @@ export const toggleRiskState = mutation({
 });
 
 // Internal mutation to seed/update vault state (simulating AI updates)
-export const updateVaultState = mutation({
+export const updateVaultState = internalMutation({
   args: {
     status: v.string(),
     current_apy: v.number(),
     tvl: v.number(),
     gold_price: v.number(),
     qie_price: v.number(),
+    analysis: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("vault_states", {
@@ -84,6 +85,7 @@ export const seedVaultData = mutation({
         gold_price: baseGold + Math.sin(i) * 50 + Math.random() * 20,
         qie_price: baseQie + Math.cos(i) * 0.1 + Math.random() * 0.05,
         timestamp: time,
+        analysis: "Historical data point",
       });
     }
   },

@@ -45,6 +45,7 @@ const schema = defineSchema(
       gold_price: v.number(),
       qie_price: v.number(),
       timestamp: v.number(),
+      analysis: v.optional(v.string()), // AI analysis explanation
     }).index("by_timestamp", ["timestamp"]),
 
     transactions: defineTable({
