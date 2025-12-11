@@ -1,0 +1,24 @@
+      
+      const parsed = JSON.parse(jsonStr);
+      
+      // Update the vault state with the new analysis
+      await ctx.runMutation(internal.vault.updateVaultState, {
+        status: parsed.status,
+        current_apy: parsed.status === "RISK_ON" ? 12.5 + Math.random() * 5 : 5 + Math.random() * 2,
+        tvl: 1250000 + Math.random() * 50000,
+        gold_price: marketData.goldPrice,
+        qie_price: marketData.qiePrice,
+        analysis: parsed.analysis,
+      });
+
+      return parsed;
+    } catch (error) {
+      console.error("Error in analyzeMarket:", error);
+      // Return a fallback state if AI fails so the UI doesn't break
+      return {
+        status: "RISK_OFF",
+        analysis: "AI Analysis unavailable. Defaulting to safe mode due to connection error."
+      };
+    }
+  }
+});

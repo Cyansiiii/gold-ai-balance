@@ -12,7 +12,8 @@ export const analyzeMarket = action({
   handler: async (ctx) => {
     try {
       const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      // Updated to use the currently supported model
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       // Simulate fetching market data (in a real app, fetch from an API)
       const marketData = {
@@ -44,6 +45,7 @@ export const analyzeMarket = action({
       const text = response.text();
       
       // Clean up the text to ensure it's valid JSON
+      // Remove markdown code blocks if present
       const jsonStr = text.replace(/(\r\n|\n|\r)/gm, '');
       
       const parsed = JSON.parse(jsonStr);

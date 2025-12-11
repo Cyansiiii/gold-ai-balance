@@ -42,12 +42,36 @@ export const createTransaction = mutation({
       let newDeposited = user.depositedAmount || 0;
       let newArmBalance = user.armBalance || 0;
 
+      // Get current gold price for conversion
+      const vaultState = await ctx.db
+        .query("vault_states")
+        .withIndex("by_timestamp")
+        .order("desc")
+        .first();
+      
+      const goldPrice = vaultState?.gold_price || 2000;
+
       if (args.type === "DEPOSIT") {
+        // Deposit adds to USD balance
         newDeposited += args.amount;
-        newArmBalance += args.amount; // 1:1 mint for simplicity
       } else if (args.type === "WITHDRAW") {
-        newDeposited = Math.max(0, newDeposited - args.amount);
-        newArmBalance = Math.max(0, newArmBalance - args.amount);
+        // Withdraw removes from USD balance
+        if (newDeposited >= args.amount) {
+          newDeposited -= args.amount;
+        } else {
+          throw new Error("Insufficient funds");
+        }
+      } else if (args.type === "REBALANCE") {
+        // REBALANCE acts as CONVERT USD -> ARM (Gold)
+        // Check if user has enough USD
+        if (newDeposited >= args.amount) {
+          newDeposited -= args.amount;
+          // Convert amount to Gold ounces (ARM)
+          const goldAmount = args.amount / goldPrice;
+          newArmBalance += goldAmount;
+        } else {
+          throw new Error("Insufficient USD balance for conversion");
+        }
       }
 
       await ctx.db.patch(userId, {

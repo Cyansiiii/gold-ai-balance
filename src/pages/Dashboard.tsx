@@ -106,7 +106,7 @@ export default function Dashboard() {
       toast.success(`${type === "DEPOSIT" ? "Deposit" : "Withdrawal"} successful`);
       setAmount("");
     } catch (error) {
-      toast.error("Transaction failed");
+      toast.error(error instanceof Error ? error.message : "Transaction failed");
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -120,16 +120,14 @@ export default function Dashboard() {
     }
     setIsSubmitting(true);
     try {
-      // Simulating conversion by just creating a rebalance transaction record
-      // In a real app, this would swap assets. Here we just log it.
       await createTransaction({
-        type: "REBALANCE", // Using REBALANCE as a proxy for conversion in this demo
+        type: "REBALANCE", 
         amount: Number(convertAmount),
       });
       toast.success(`Successfully converted ${convertAmount} USD to Gold (ARM)`);
       setConvertAmount("");
     } catch (error) {
-      toast.error("Conversion failed");
+      toast.error(error instanceof Error ? error.message : "Conversion failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -190,19 +188,20 @@ export default function Dashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard 
-            title="Total Balance" 
-            value={(user.depositedAmount || 0) * (vaultState?.gold_price || 2000) / 2000}
+            title="USD Balance" 
+            value={user.depositedAmount || 0}
             isCurrency
             icon={<Wallet className="w-4 h-4 text-primary" />}
             trend="+2.5%"
             delay={0.1}
           />
           <StatsCard 
-            title="ARM Tokens" 
+            title="ARM Tokens (Gold)" 
             value={user.armBalance || 0} 
             icon={<Shield className="w-4 h-4 text-blue-400" />}
-            subtext="1 ARM = 1 Gold oz (peg)"
+            subtext={`≈ ${formatCurrency((user.armBalance || 0) * (vaultState?.gold_price || 2000))} USD`}
             delay={0.2}
+            decimals={4}
           />
           <StatsCard 
             title="Current APY" 
@@ -314,7 +313,7 @@ export default function Dashboard() {
                           {tx.type === 'DEPOSIT' ? <ArrowDownLeft className="w-4 h-4" /> : tx.type === 'WITHDRAW' ? <ArrowUpRight className="w-4 h-4" /> : <RefreshCw className="w-4 h-4" />}
                         </div>
                         <div>
-                          <p className="font-medium">{tx.type}</p>
+                          <p className="font-medium">{tx.type === 'REBALANCE' ? 'CONVERSION' : tx.type}</p>
                           <p className="text-xs text-muted-foreground">{new Date(tx.timestamp).toLocaleString()}</p>
                         </div>
                       </div>
@@ -374,7 +373,7 @@ export default function Dashboard() {
                       {isSubmitting ? "Processing..." : "Deposit Funds"}
                     </Button>
                     <p className="text-xs text-muted-foreground text-center">
-                      Funds are automatically converted to ARM tokens
+                      Deposits are held in USD until converted
                     </p>
                   </TabsContent>
 
@@ -418,12 +417,12 @@ export default function Dashboard() {
                     </div>
                     <div className="p-3 bg-white/5 rounded-lg text-xs space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Rate</span>
-                        <span>1 USD ≈ 0.0005 OZ</span>
+                        <span className="text-muted-foreground">Current Gold Price</span>
+                        <span>{formatCurrency(vaultState?.gold_price || 2000)} / oz</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Fee</span>
-                        <span>0.1%</span>
+                        <span className="text-muted-foreground">Est. ARM Tokens</span>
+                        <span>{convertAmount && !isNaN(Number(convertAmount)) ? (Number(convertAmount) / (vaultState?.gold_price || 2000)).toFixed(4) : "0.0000"}</span>
                       </div>
                     </div>
                     <Button 
@@ -490,7 +489,7 @@ export default function Dashboard() {
   );
 }
 
-function StatsCard({ title, value, icon, trend, subtext, delay = 0, isCurrency = false, suffix = "" }: { title: string, value: number, icon: React.ReactNode, trend?: string, subtext?: string, delay?: number, isCurrency?: boolean, suffix?: string }) {
+function StatsCard({ title, value, icon, trend, subtext, delay = 0, isCurrency = false, suffix = "", decimals = 2 }: { title: string, value: number, icon: React.ReactNode, trend?: string, subtext?: string, delay?: number, isCurrency?: boolean, suffix?: string, decimals?: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -507,7 +506,7 @@ function StatsCard({ title, value, icon, trend, subtext, delay = 0, isCurrency =
                   value={value} 
                   prefix={isCurrency ? "$" : ""} 
                   suffix={suffix}
-                  decimals={isCurrency ? 2 : 2}
+                  decimals={decimals}
                 />
               </h3>
               {subtext && <p className="text-xs text-muted-foreground mt-1">{subtext}</p>}
