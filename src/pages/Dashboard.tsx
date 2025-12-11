@@ -31,7 +31,8 @@ import {
   Shield, 
   Zap,
   LogOut,
-  RefreshCw
+  RefreshCw,
+  ShieldCheck
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -171,13 +172,13 @@ export default function Dashboard() {
           className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
         >
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-primary">Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-primary">Aurum-AI Dashboard</h1>
             <p className="text-muted-foreground">Welcome back, {user.name || "User"}</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="glass px-4 py-2 rounded-full flex items-center gap-2 text-sm">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              System Operational
+              QIE Mainnet Connected
             </div>
             <Button variant="outline" onClick={() => signOut()} className="gap-2">
               <LogOut className="w-4 h-4" /> Sign Out
@@ -216,20 +217,23 @@ export default function Dashboard() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="glass border-none h-full">
+            <Card className="glass border-none h-full bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700">
               <CardContent className="p-6 flex flex-col justify-between h-full">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Risk Mode</p>
-                    <h3 className="text-2xl font-bold mt-2">{vaultState?.status || "ANALYZING"}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">Auto-Rebalancing</p>
-                  </div>
-                  <div className="p-2 bg-white/5 rounded-lg">
-                    <Activity className="w-4 h-4 text-orange-400" />
+                    <p className="text-sm font-medium text-slate-400 flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-green-400" /> AI Vault Status
+                    </p>
+                    <h3 className="text-2xl font-bold mt-2 font-mono">
+                      {vaultState?.status === "RISK_ON" ? "Risk On (Growth)" : "Risk Off (Safety)"}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-2">
+                      Powered by QIE Native Gold Oracles. Updates every 3 seconds.
+                    </p>
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Toggle Risk Strategy</span>
+                  <span className="text-xs text-muted-foreground">Manual Override</span>
                   <Switch 
                     checked={vaultState?.status === "RISK_ON"}
                     onCheckedChange={handleRiskToggle}
@@ -372,8 +376,8 @@ export default function Dashboard() {
                     >
                       {isSubmitting ? "Processing..." : "Deposit Funds"}
                     </Button>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Deposits are held in USD until converted
+                    <p className="text-xs text-green-400 text-center">
+                      * Receive $ARM rewards instantly upon deposit.
                     </p>
                   </TabsContent>
 
