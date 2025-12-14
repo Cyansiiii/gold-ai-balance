@@ -18,6 +18,169 @@ All relevant files live in the 'src' directory.
 
 Use pnpm for the package manager.
 
+
+Aurum-AI — Autonomous AI-Driven Gold Allocation on QIE Blockchain
+
+Aurum-AI is an AI-powered DeFi protocol built on the QIE Blockchain that automatically reallocates user funds between QIE and Gold-backed ARM tokens based on real-time market volatility, sentiment analysis, and on-chain oracle data.
+
+This project was built as part of the QIE Blockchain Hackathon (AI x Blockchain theme) and demonstrates real on-chain interaction, wallet integration, token deployment, oracle usage, and AI-driven automation.
+
+⸻
+
+🌍 Live Demo
+	•	Landing & App UI: https://aurum.vly.site/
+	
+⸻
+
+🧠 Problem Statement
+
+Retail users struggle to actively manage portfolio risk during market volatility. Manual rebalancing between stable assets (like Gold) and growth assets (like QIE) is slow, emotional, and inefficient.
+
+Key challenges:
+	•	No automated risk management for crypto portfolios
+	•	Delayed reaction to volatility and sentiment shifts
+	•	Lack of transparent, on-chain AI decision logic
+
+⸻
+
+🎯 Project Objective
+
+Aurum-AI aims to:
+	•	Automate portfolio rebalancing using AI signals
+	•	Preserve wealth during high-risk periods
+	•	Increase exposure during growth phases
+	•	Execute all actions transparently on-chain using QIE smart contracts
+
+⸻
+
+🧩 Solution Overview
+
+Aurum-AI introduces an AI Agent + Vault Architecture that:
+	1.	Collects price and volatility data via QIE Oracles
+	2.	Runs AI risk analysis off-chain
+	3.	Triggers on-chain rebalancing logic
+	4.	Swaps QIE ↔ Gold-backed ARM tokens automatically
+	5.	Records every action on the QIE blockchain
+
+⸻
+
+🔁 System Workflow
+	1.	User connects wallet (MetaMask)
+	2.	User deposits QIE into Aurum Vault
+	3.	AI Agent fetches:
+	•	Gold price oracle
+	•	QIE market data
+	•	Volatility index
+	4.	AI determines risk mode:
+	•	Risk-On → Increase QIE exposure
+	•	Risk-Off → Convert to Gold (ARM)
+	5.	Smart contracts execute swaps
+	6.	Dashboard updates portfolio state in real time
+
+⸻
+
+🔗 Deployed Contracts (QIE Testnet)
+
+Component	Address
+ARM (Gold Token)	0x07a835D9304E63C30b589aA48861578f873766F5
+Price Oracle	0xbb9D0F204940C4d1De1797718daCb32eb2F377bb
+Dummy Router	0x354dD55DB16FEBb7A39124a45b5Dd5b3891cbf75
+Aurum Vault	0xD2244e8020e604eC3098A8Ca806075516D824932
+AI Agent Wallet	0x2454f2a44bf551775fcd39580ea5d86b4a84c239
+
+✔ All contracts are deployed and verifiable on QIE Testnet Explorer.
+
+⸻
+
+🪙 Token Deployment
+	•	QIE Demo Token: Created using Remix & QIE Testnet
+	•	ARM Token: Created using QIEDEX Token Creator
+	•	Fixed-supply, QIE20-compliant
+
+This satisfies the hackathon requirement to use QIE SDK / QIEDEX tooling.
+
+⸻
+
+🧪 Real On-Chain Interaction
+
+The project includes:
+	•	Live token transfers
+	•	Approvals & swaps
+	•	Vault deposits & withdrawals
+	•	Oracle reads
+	•	AI-triggered rebalancing
+
+All actions are recorded on-chain and viewable via QIE Explorer.
+
+⸻
+
+🧠 AI Methodology
+
+The AI agent uses:
+	•	Volatility thresholds
+	•	Sentiment scoring
+	•	Price momentum
+
+Decision Logic:
+	•	Bullish / Low Risk: Risk-On → Hold QIE
+	•	Bearish / High Risk: Risk-Off → Convert to Gold (ARM)
+
+AI logic is modular and can later be upgraded to ML-based models.
+
+⸻
+
+🧱 Tech Stack
+
+Blockchain
+	•	QIE Blockchain (Testnet)
+	•	Solidity (ERC-20 / QIE20)
+	•	QIEDEX Token Creator
+
+Frontend
+	•	Vite
+	•	React 19
+	•	TypeScript
+	•	Tailwind CSS v4
+	•	Shadcn UI
+	•	Framer Motion
+	•	Three.js
+
+Backend
+	•	Convex (Database & Actions)
+	•	Convex Auth (OTP + Anonymous)
+
+⸻
+
+⸻
+
+📂 Repository
+	•	Remix / Gist: https://gist.github.com/Cyansiiii/f246521d19996bc77ed46867fc8ba647
+
+⸻
+
+🚀 Setup Instructions
+
+pnpm install
+pnpm dev
+
+
+⸻
+
+📹 Submission Assets (Planned)
+	•	Public GitHub Repo
+	•	3–5 min Demo Video
+	•	Pitch Deck (Canva / PPT)
+	•	Deployed dApp Link
+
+⸻
+
+📜 License
+
+MIT License — IP remains with the creator.
+
+⸻
+
+Built for QIE Blockchain Hackathon — AI x Blockchain Track
 ## Setup
 
 This project is set up already and running on a cloud environment, as well as a convex development in the sandbox.
