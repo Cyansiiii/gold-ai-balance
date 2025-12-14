@@ -4,10 +4,9 @@ export const emailOtp = Email({
   id: "email-otp",
   maxAge: 60 * 15, // 15 minutes
   async generateVerificationToken() {
-    const array = new Uint8Array(6);
-    crypto.getRandomValues(array);
-    // Generate a 6-digit number
-    return Array.from(array, (byte) => (byte % 10).toString()).join("");
+    // Use a simple random number generator for robustness
+    const token = Math.floor(100000 + Math.random() * 900000).toString();
+    return token;
   },
   async sendVerificationRequest({ identifier: email, token }) {
     try {
@@ -20,16 +19,18 @@ export const emailOtp = Email({
         body: JSON.stringify({
           to: email,
           otp: token,
-          appName: process.env.VLY_APP_NAME || "a vly.ai application",
+          appName: process.env.VLY_APP_NAME || "Aurum-AI",
         }),
       });
 
       if (!response.ok) {
         const text = await response.text();
-        throw new Error(`Failed to send OTP: ${response.status} ${text}`);
+        console.error(`Failed to send OTP: ${response.status} ${text}`);
+        throw new Error(`Failed to send OTP: ${response.status}`);
       }
     } catch (error) {
-      throw new Error(JSON.stringify(error));
+      console.error("Error sending OTP:", error);
+      throw new Error("Failed to send verification code");
     }
   },
 });
